@@ -7,7 +7,9 @@ package SimulacionTelefono;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
@@ -194,8 +196,19 @@ public class main extends javax.swing.JFrame {
         jLabel3.setText("Mensajes");
 
         btnNuevoMensaje.setText("Nuevo");
+        btnNuevoMensaje.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnNuevoMensajeMouseClicked(evt);
+            }
+        });
 
         btnEnviarMensaje.setText("Enviar");
+        btnEnviarMensaje.setEnabled(false);
+        btnEnviarMensaje.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnEnviarMensajeMouseClicked(evt);
+            }
+        });
 
         txtAContenido.setColumns(20);
         txtAContenido.setRows(5);
@@ -204,6 +217,12 @@ public class main extends javax.swing.JFrame {
         jLabel5.setText("Contenido");
 
         btnCancelarMensaje.setText("Cancelar");
+        btnCancelarMensaje.setEnabled(false);
+        btnCancelarMensaje.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnCancelarMensajeMouseClicked(evt);
+            }
+        });
 
         btnVerMsj.setText("Ver Msj");
         btnVerMsj.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -543,6 +562,54 @@ public class main extends javax.swing.JFrame {
             db.desconectar();
         }
     }//GEN-LAST:event_btnEliminarMouseClicked
+
+    private void btnNuevoMensajeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnNuevoMensajeMouseClicked
+        if (this.tblRegistroContactos.getSelectedRow() >= 0) {
+            this.txtAContenido.setText("");
+            this.btnEnviarMensaje.setEnabled(true);
+            this.btnCancelarMensaje.setEnabled(true);
+            this.btnVerMsj.setEnabled(false);
+            this.btnNuevoMensaje.setEnabled(false);
+        }else{
+                JOptionPane.showMessageDialog(this, "Debe Seleccionar un Usuario al cual mandar el mensaje!!!");
+        }
+
+    }//GEN-LAST:event_btnNuevoMensajeMouseClicked
+
+    private void btnEnviarMensajeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEnviarMensajeMouseClicked
+        if (this.txtAContenido.getText().equals("")) {
+            JOptionPane.showMessageDialog(this, "Debe Ingresar un mensaje");
+        } else {
+            this.modeloMensaje = (DefaultListModel) this.lstMensajes.getModel();
+            SimpleDateFormat form = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+            Mensaje m = new Mensaje(this.txtAContenido.getText(), this.tblRegistroContactos.getValueAt(this.tblRegistroContactos.getSelectedRow(), 0).toString(), form.format(new Date()));
+            this.mensajes.add(m);
+            db.conectar();
+            try {
+                db.query.execute("INSERT INTO Mensajes"
+                        + " (emisor, receptor, fecha, mensaje)"
+                        + " VALUES ('" + m.getEmisor() + "', '" + m.getReceptor() + "', '" + m.getFecha() + "', '" + m.getContenido() + "')");
+                db.commit();
+                this.modeloMensaje.addElement(m);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            db.desconectar();
+            this.txtAContenido.setText("");
+            this.btnEnviarMensaje.setEnabled(false);
+            this.btnCancelarMensaje.setEnabled(false);
+            this.btnVerMsj.setEnabled(true);
+            this.btnNuevoMensaje.setEnabled(true);
+        }
+    }//GEN-LAST:event_btnEnviarMensajeMouseClicked
+
+    private void btnCancelarMensajeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnCancelarMensajeMouseClicked
+        this.txtAContenido.setText("");
+            this.btnEnviarMensaje.setEnabled(false);
+            this.btnCancelarMensaje.setEnabled(false);
+            this.btnVerMsj.setEnabled(true);
+            this.btnNuevoMensaje.setEnabled(true);
+    }//GEN-LAST:event_btnCancelarMensajeMouseClicked
     
     public void cargarContacto() {
         db.conectar();
