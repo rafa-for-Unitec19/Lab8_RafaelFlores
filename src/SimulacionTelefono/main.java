@@ -334,6 +334,11 @@ public class main extends javax.swing.JFrame {
         });
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnEliminarMouseClicked(evt);
+            }
+        });
 
         jMenu1.setText("Archivo");
 
@@ -407,7 +412,43 @@ public class main extends javax.swing.JFrame {
 
     private void btnSalvarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSalvarMouseClicked
         if (modificar) {
-            
+            if (this.txtNombre.getText().equals("") || this.txtDireccion.getText().equals("") || this.txtCorreo.getText().equals("")) {
+            JOptionPane.showMessageDialog(this.jdAgregarModifcarContacto, "Debe llenar todos los campos", "Error de Ingreso", JOptionPane.ERROR_MESSAGE);
+            } else {
+                try {
+                    db.conectar();
+                    db.query.execute("select * from Contacto where telefono = " + Integer.parseInt(this.spnTelefono.getValue().toString()));
+                    ResultSet rs = db.query.getResultSet();
+                    rs.next();
+                    int cuenta = rs.getInt("Id");
+                    db.desconectar();
+                    db.conectar();
+                    this.modeloContacto = (DefaultTableModel) this.tblRegistroContactos.getModel();
+                    for (int i = 0; i < this.contactos.size(); i++) {
+                        if (contactos.get(i).getNumero() == Integer.parseInt(this.tblRegistroContactos.getValueAt(this.tblRegistroContactos.getSelectedRow(), 2).toString())) {
+                            this.tblRegistroContactos.setValueAt(this.txtNombre.getText(), this.tblRegistroContactos.getSelectedRow(), 0);
+                            contactos.get(i).setNombre(this.txtNombre.getText());
+                            this.tblRegistroContactos.setValueAt(this.txtCorreo.getText(), this.tblRegistroContactos.getSelectedRow(), 3);
+                            contactos.get(i).setCorreo(this.txtNombre.getText());
+                            this.tblRegistroContactos.setValueAt(this.txtDireccion.getText(), this.tblRegistroContactos.getSelectedRow(), 4);
+                            contactos.get(i).setDireccion(this.txtDireccion.getText());
+                            this.tblRegistroContactos.setValueAt(Integer.parseInt(this.spnEdad.getValue().toString()), this.tblRegistroContactos.getSelectedRow(), 1);
+                            contactos.get(i).setEdad(Integer.parseInt(this.spnEdad.getValue().toString()));
+                            break;
+                        }
+                    }
+                    db.query.execute("update Contacto set nombre='" + this.txtNombre.getText() + "',"
+                            + "direccion = '" + this.txtDireccion.getText() + "',"
+                            + "correo = '" + this.txtCorreo.getText() + "', "
+                            + "edad = " + Integer.parseInt(this.spnEdad.getValue().toString()) + " where Id=" + cuenta);
+                    db.commit();
+
+                } catch (SQLException ex) {
+                    Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                db.desconectar();
+                modificar = false;
+            }
         }else{
             if (this.txtNombre.getText().equals("") || this.txtDireccion.getText().equals("") || this.txtCorreo.getText().equals("")) {
             JOptionPane.showMessageDialog(this.jdAgregarModifcarContacto, "Debe llenar todos los campos", "Error de Ingreso", JOptionPane.ERROR_MESSAGE);
@@ -460,16 +501,48 @@ public class main extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void btnModificarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnModificarMouseClicked
-        if (this.tblRegistroContactos.getSelectedRow() > 0) {
+        if (this.tblRegistroContactos.getSelectedRow() >= 0) {
             this.modeloContacto = (DefaultTableModel) this.tblRegistroContactos.getModel();
             this.txtNombre.setText(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 0).toString());
             this.txtCorreo.setText(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 3).toString());
             this.txtDireccion.setText(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 4).toString());
-            this.spnEdad.setValue(Integer.parseInt(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 0).toString()));
-            this.spnTelefono.setValue(Integer.parseInt(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 0).toString()));
+            this.spnEdad.setValue(Integer.parseInt(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 1).toString()));
+            this.spnTelefono.setValue(Integer.parseInt(modeloContacto.getValueAt(this.tblRegistroContactos.getSelectedRow(), 2).toString()));
             this.modificar = true;
+            this.spnTelefono.setEnabled(false);
+            this.jdAgregarModifcarContacto.setModal(true);
+            this.jdAgregarModifcarContacto.pack();
+            this.jdAgregarModifcarContacto.setLocationRelativeTo(this);
+            this.jdAgregarModifcarContacto.setVisible(true);
         }
     }//GEN-LAST:event_btnModificarMouseClicked
+
+    private void btnEliminarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnEliminarMouseClicked
+        if (this.tblRegistroContactos.getSelectedRow() >= 0) {
+            this.modeloContacto = (DefaultTableModel) this.tblRegistroContactos.getModel();
+            db.conectar();
+            try {
+                db.query.execute("select * from Contacto where telefono = " + Integer.parseInt(this.spnTelefono.getValue().toString()));
+                ResultSet rs = db.query.getResultSet();
+                rs.next();
+                int cuenta = rs.getInt("Id");
+                db.desconectar();
+                db.conectar();
+                for (int i = 0; i < this.contactos.size(); i++) {
+                        if (contactos.get(i).getNumero() == Integer.parseInt(this.tblRegistroContactos.getValueAt(this.tblRegistroContactos.getSelectedRow(), 2).toString())) {
+                            contactos.remove(i);
+                            modeloContacto.removeRow(this.tblRegistroContactos.getSelectedRow());
+                            break;
+                        }
+                    }
+                    db.query.execute("delete from Contacto where Id="+cuenta);
+                    db.commit();
+            } catch (SQLException ex) {
+                Logger.getLogger(main.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            db.desconectar();
+        }
+    }//GEN-LAST:event_btnEliminarMouseClicked
     
     public void cargarContacto() {
         db.conectar();
@@ -520,6 +593,10 @@ public class main extends javax.swing.JFrame {
         this.txtCorreo.setText("");
         this.txtDireccion.setText("");
         this.txtNombre.setText("");
+    }
+    
+    public void modificarEnArrayList(){
+    
     }
     
     /**
