@@ -14,14 +14,14 @@ import java.util.Date;
  */
 public class Mensaje {
     private String emisor, contenido;
-    private Contacto receptor;
-    private Date fecha;
+    private String receptor;
+    private String fecha;
 
     public Mensaje() {
     }
 
-    public Mensaje(String emisor, String contenido, Contacto receptor, Date fecha) {
-        this.emisor = emisor;
+    public Mensaje(String contenido, String receptor, String fecha) {
+        this.emisor = "Rafael";
         this.contenido = contenido;
         this.receptor = receptor;
         this.fecha = fecha;
@@ -35,11 +35,11 @@ public class Mensaje {
         this.contenido = contenido;
     }
 
-    public void setReceptor(Contacto receptor) {
+    public void setReceptor(String receptor) {
         this.receptor = receptor;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(String fecha) {
         this.fecha = fecha;
     }
 
@@ -51,22 +51,25 @@ public class Mensaje {
         return contenido;
     }
 
-    public Contacto getReceptor() {
+    public String getReceptor() {
         return receptor;
     }
 
-    public Date getFecha() {
+    public String getFecha() {
         return fecha;
     }
 
     @Override
     public String toString() {
-        SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy hh:mm");
-        return format.format(getFecha()) +"-->"+ this.getReceptor().getNombre();   
+        return getFecha() +"-->"+ this.getReceptor();   
     }
     
     public String getContenidoFormateado(){
-        return "";
+        return "Emisor: "+this.getEmisor()
+               +"\nReceptor: "+ this.getReceptor()
+               +"\n"
+               +"En Fecha:"+this.getFecha()
+               +"\nContenido: \n\t"+this.getContenido();
     }
     
     
