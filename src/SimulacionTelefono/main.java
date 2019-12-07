@@ -75,6 +75,8 @@ public class main extends javax.swing.JFrame {
         btnLllamar = new javax.swing.JButton();
         btnColgar = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        lblTiempoLlamada = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         btnModificar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -306,10 +308,23 @@ public class main extends javax.swing.JFrame {
         jScrollPane2.setViewportView(tblRegistroLlamadas);
 
         btnLllamar.setText("LLamar");
+        btnLllamar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnLllamarMouseClicked(evt);
+            }
+        });
 
         btnColgar.setText("Colgar");
+        btnColgar.setEnabled(false);
+        btnColgar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnColgarActionPerformed(evt);
+            }
+        });
 
         jLabel6.setText("Registro de Llamadas");
+
+        jLabel11.setText("Duracion");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -318,16 +333,22 @@ public class main extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(btnLllamar)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnColgar))
-                            .addComponent(jLabel6))
-                        .addGap(0, 460, Short.MAX_VALUE)))
-                .addContainerGap())
+                                .addComponent(jLabel6)
+                                .addGap(0, 495, Short.MAX_VALUE)))
+                        .addContainerGap())
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(btnLllamar)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnColgar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel11)
+                        .addGap(17, 17, 17)
+                        .addComponent(lblTiempoLlamada)
+                        .addGap(18, 18, 18))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -339,7 +360,9 @@ public class main extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnLllamar)
-                    .addComponent(btnColgar))
+                    .addComponent(btnColgar)
+                    .addComponent(lblTiempoLlamada)
+                    .addComponent(jLabel11))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -610,6 +633,25 @@ public class main extends javax.swing.JFrame {
             this.btnVerMsj.setEnabled(true);
             this.btnNuevoMensaje.setEnabled(true);
     }//GEN-LAST:event_btnCancelarMensajeMouseClicked
+
+    private void btnLllamarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLllamarMouseClicked
+        if (this.tblRegistroContactos.getSelectedRow() >= 0) {
+            llamada = new Llamada(this.tblRegistroContactos.getValueAt(this.tblRegistroContactos.getSelectedRow(), 0).toString(), this.tblRegistroLlamadas,
+        this.modeloLLamada, this.lblTiempoLlamada);
+            llamada.start();
+            this.btnLllamar.setEnabled(false);
+            this.btnColgar.setEnabled(true);
+        }else{
+            JOptionPane.showMessageDialog(this, "Debe Seleccionar un Contacto");
+        }
+        
+    }//GEN-LAST:event_btnLllamarMouseClicked
+
+    private void btnColgarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnColgarActionPerformed
+        this.llamada.setAvanzar(false);
+        this.btnLllamar.setEnabled(true);
+        this.btnColgar.setEnabled(false);
+    }//GEN-LAST:event_btnColgarActionPerformed
     
     public void cargarContacto() {
         db.conectar();
@@ -713,6 +755,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JButton btnVerMsj;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -733,6 +776,7 @@ public class main extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JDialog jdAgregarModifcarContacto;
+    private javax.swing.JLabel lblTiempoLlamada;
     private javax.swing.JList<String> lstMensajes;
     private javax.swing.JSpinner spnEdad;
     private javax.swing.JSpinner spnTelefono;
@@ -750,4 +794,5 @@ public class main extends javax.swing.JFrame {
     private DefaultTableModel modeloLLamada = new DefaultTableModel();
     private DefaultListModel modeloMensaje = new DefaultListModel();
     private boolean modificar = false;
+    Llamada llamada = null;
 }
